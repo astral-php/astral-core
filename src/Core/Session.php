@@ -22,7 +22,25 @@ final class Session
 
     public function start(): void
     {
-        if (!$this->started && session_status() === PHP_SESSION_NONE) {
+        if ($this->started) {
+            return;
+        }
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $this->started = true;
+            return;
+        }
+
+        // CLI / PHPUnit : en-têtes déjà envoyés → session tableau sans cookie
+        if (headers_sent() || PHP_SAPI === 'cli') {
+            if (!isset($_SESSION) || !is_array($_SESSION)) {
+                $_SESSION = [];
+            }
+            $this->started = true;
+            return;
+        }
+
+        if (session_status() === PHP_SESSION_NONE) {
             session_start();
             $this->started = true;
         }

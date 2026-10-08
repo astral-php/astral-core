@@ -117,7 +117,11 @@ final class Router
     // Dispatch
     // -------------------------------------------------------------------------
 
-    public function dispatch(): void
+    /**
+     * Résout la route et retourne la réponse du pipeline (sans envoi HTTP).
+     * Utile pour les tests d'intégration applicatifs.
+     */
+    public function handle(): mixed
     {
         $method = $this->request->method;
         $uri    = $this->request->uri;
@@ -142,9 +146,15 @@ final class Router
             throw new NotFoundException("Action introuvable : {$controllerClass}::{$action}");
         }
 
-        $response = $this->runWithMiddleware($middlewares, function () use ($controller, $action, $params): mixed {
+        return $this->runWithMiddleware($middlewares, function () use ($controller, $action, $params): mixed {
             return $controller->$action(...$params);
         });
+    }
+
+    /** Résout la route et envoie la réponse HTTP si c'est un objet Response. */
+    public function dispatch(): void
+    {
+        $response = $this->handle();
 
         if ($response instanceof Response) {
             $response->send();

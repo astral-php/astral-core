@@ -5,9 +5,8 @@ Moteur PHP **8.1+** d’[Astral](https://github.com/astral-php/astral) : HTTP, D
 Package **`library`** — fondation des **applications** (`create-project`) et des **composants** (`require`).
 
 [![PHP](https://img.shields.io/badge/PHP-8.1%E2%80%938.5-777BB4?logo=php&logoColor=white)](https://www.php.net)
-[![Version](https://img.shields.io/badge/version-1.2.3-blue)](./CHANGELOG.md)
-
-> Voir le hub [`astral.md`](../../mvc/astral.md) (Apps / Core / Components).
+[![Version](https://img.shields.io/badge/version-1.2.4-blue)](./CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-PHPUnit%209.6-9933CC)](./phpunit.xml)
 
 ## Installation
 
@@ -33,14 +32,21 @@ En local (`components-astral`) :
 
 Helpers globaux : `dump()`, `dd()` (`src/helpers.php`).
 
+## Tests
+
+```bash
+composer install
+composer test
+```
+
+`Router::handle()` retourne la `Response` sans `send()` — pour les smokes HTTP des apps.
+
 ## Dépendances
 
 - `vlucas/phpdotenv` ^5.6  
 - `phpmailer/phpmailer` ^7.0  
 
 ## Usage typique
-
-Les applications (`astral-php/astral`, futur `astral-blog`) et les composants déclarent :
 
 ```json
 "require": {
@@ -53,7 +59,7 @@ L’app hôte définit `BASE_PATH`, fournit `app/`, `config/`, `public/`, `views
 ## Compatibilité
 
 - PHP : `^8.1` (cible 8.1 → 8.5)
-- Aligné sur Astral MVC **1.2.3**
+- Aligné sur Astral MVC **1.2.4** (hub doc) ; package **1.2.4**
 
 ## Licence
 

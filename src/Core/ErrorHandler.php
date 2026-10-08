@@ -135,9 +135,8 @@ final class ErrorHandler
 
     private function render(int $code, ?Throwable $e): void
     {
-        http_response_code($code);
-
         if (!headers_sent()) {
+            http_response_code($code);
             header('Content-Type: text/html; charset=UTF-8');
         }
 
