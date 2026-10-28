@@ -15,13 +15,13 @@ use Core\Session;
  * Usage dans un contrôleur :
  *   $this->auth->login($user);
  *   $this->auth->logout();
- *   $this->auth->check();         // est connecté ?
- *   $this->auth->is(Role::ADMIN); // a exactement ce rôle ?
- *   $this->auth->can(Role::ADMIN, Role::USER); // a l'un de ces rôles ?
+ *   $this->auth->check();
+ *   $this->auth->is(Role::Admin);
+ *   $this->auth->can(Role::Admin, Role::User);
  *
  * Usage dans une vue :
  *   <?php if ($auth->check()): ?> Bonjour <?= $auth->name() ?> <?php endif ?>
- *   <?php if ($auth->is(Role::ADMIN)): ?> <a href="/admin">Admin</a> <?php endif ?>
+ *   <?php if ($auth->is(Role::Admin)): ?> <a href="/admin">Admin</a> <?php endif ?>
  */
 final class Auth
 {
@@ -36,16 +36,18 @@ final class Auth
     /**
      * Connecte l'utilisateur et stocke ses données en session.
      * Régénère l'ID de session pour prévenir la fixation de session.
+     *
+     * `$user->role` peut être un Role, une string, ou absent (défaut User).
      */
     public function login(object $user): void
     {
-        session_regenerate_id(true);
+        $this->regenerateSessionId();
 
         $this->session->set(self::SESSION_KEY, [
             'id'    => $user->id,
             'name'  => $user->name,
             'email' => $user->email,
-            'role'  => $user->role ?? Role::USER,
+            'role'  => $this->normalizeRole($user->role ?? Role::User),
         ]);
     }
 
@@ -55,7 +57,7 @@ final class Auth
     public function logout(): void
     {
         $this->session->forget(self::SESSION_KEY);
-        session_regenerate_id(true);
+        $this->regenerateSessionId();
     }
 
     // -------------------------------------------------------------------------
@@ -77,21 +79,31 @@ final class Auth
     /**
      * L'utilisateur a-t-il exactement ce rôle ?
      *
-     *   $auth->is(Role::ADMIN)
+     *   $auth->is(Role::Admin)
+     *   $auth->is('admin')
      */
-    public function is(string $role): bool
+    public function is(Role|string $role): bool
     {
-        return $this->role() === $role;
+        return $this->role() === $this->normalizeRole($role);
     }
 
     /**
      * L'utilisateur a-t-il l'un des rôles listés ?
      *
-     *   $auth->can(Role::ADMIN, Role::USER)
+     *   $auth->can(Role::Admin, Role::User)
+     *   $auth->can('admin', 'user')
      */
-    public function can(string ...$roles): bool
+    public function can(Role|string ...$roles): bool
     {
-        return in_array($this->role(), $roles, true);
+        $current = $this->role();
+
+        foreach ($roles as $role) {
+            if ($current === $this->normalizeRole($role)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // -------------------------------------------------------------------------
@@ -121,9 +133,22 @@ final class Auth
         return (string) ($this->user()['email'] ?? '');
     }
 
-    /** Retourne le rôle courant (Role::GUEST si non connecté). */
+    /** Retourne le rôle courant (valeur string ; Guest si non connecté). */
     public function role(): string
     {
-        return (string) ($this->user()['role'] ?? Role::GUEST);
+        return (string) ($this->user()['role'] ?? Role::Guest->value);
+    }
+
+    private function normalizeRole(Role|string $role): string
+    {
+        return $role instanceof Role ? $role->value : $role;
+    }
+
+    /** No-op en CLI / sans session native (aligné Session::start). */
+    private function regenerateSessionId(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
     }
 }

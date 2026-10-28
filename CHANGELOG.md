@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.0.0] — 2026-10-28
+
+### Breaking
+
+- PHP minimum : **`^8.3`** (drop 8.1 / 8.2).
+- `Core\Auth\Role` : class + constantes → **backed enum** `Role::Admin` / `Role::User` / `Role::Guest` (valeurs string inchangées : `admin`, `user`, `guest`).
+- `Auth::is()` / `Auth::can()` : acceptent `Role|string`.
+- `Core\Cache` :
+  - `has()` / `remember()` traitent correctement une valeur stockée `null` (hit).
+  - `unserialize(..., ['allowed_classes' => false])`.
+  - TTL `< 1` → `InvalidArgumentException`.
+  - Échec `mkdir` / écriture → `RuntimeException`.
+  - Payload invalide / objets → miss + purge.
+
+### Ajouté
+
+- Spec / comportements cache documentés (UPGRADE + infos audit 2.0).
+- Tests `AuthTest`, `RoleTest` ; CacheTest étendu (null, TTL, payload).
+
+### Notes
+
+- Anti-stampede `remember` : toujours best-effort (LOCK_EX écriture seule) — cache avancé → package **astral-cache** (plus tard).
+- Guide migration : [`UPGRADE-2.0.md`](./UPGRADE-2.0.md).
+
 ## [1.2.4] — 2026-10-08
 
 ### Ajouté

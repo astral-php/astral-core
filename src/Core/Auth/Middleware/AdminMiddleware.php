@@ -32,7 +32,7 @@ final class AdminMiddleware implements MiddlewareInterface
             return RedirectResponse::to('/login');
         }
 
-        if (!$this->auth->is(Role::ADMIN)) {
+        if (!$this->auth->is(Role::Admin)) {
             throw new AuthorizationException("Accès réservé aux administrateurs.");
         }
 

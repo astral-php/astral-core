@@ -1,8 +1,8 @@
 {
   "name": "astral-php/astral-core",
-  "description": "Astral Core — moteur PHP 8.1+ (HTTP, DI, router, auth, DAO, vues, CLI) pour les applications et composants Astral",
+  "description": "Astral Core — moteur PHP 8.3+ (HTTP, DI, router, auth, DAO, vues, CLI) pour les applications et composants Astral",
   "type": "library",
-  "version": "1.2.4",
+  "version": "2.0.0",
   "license": "MIT",
   "keywords": [
     "astral",
@@ -16,7 +16,7 @@
   ],
   "homepage": "https://github.com/astral-php/astral-core",
   "require": {
-    "php": "^8.1",
+    "php": "^8.3",
     "vlucas/phpdotenv": "^5.6",
     "phpmailer/phpmailer": "^7.0"
   },

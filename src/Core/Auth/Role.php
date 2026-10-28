@@ -5,26 +5,30 @@ declare(strict_types=1);
 namespace Core\Auth;
 
 /**
- * Constantes de rôles.
+ * Rôles applicatifs (backed enum).
  *
- * Utilisez ces constantes partout pour éviter les fautes de frappe :
- *   $auth->is(Role::ADMIN)
- *   $auth->can(Role::ADMIN, Role::USER)
+ * Usage :
+ *   $auth->is(Role::Admin)
+ *   $auth->can(Role::Admin, Role::User)
+ *   Role::isValid('admin')
  */
-final class Role
+enum Role: string
 {
-    public const ADMIN = 'admin';
-    public const USER  = 'user';
-    public const GUEST = 'guest';
+    case Admin = 'admin';
+    case User  = 'user';
+    case Guest = 'guest';
 
-    /** @return list<string> Tous les rôles valides */
+    /** @return list<string> */
     public static function all(): array
     {
-        return [self::ADMIN, self::USER, self::GUEST];
+        return array_map(
+            static fn (self $role): string => $role->value,
+            self::cases()
+        );
     }
 
     public static function isValid(string $role): bool
     {
-        return in_array($role, self::all(), true);
+        return self::tryFrom($role) !== null;
     }
 }

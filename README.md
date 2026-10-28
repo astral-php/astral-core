@@ -1,18 +1,20 @@
 # astral-core
 
-Moteur PHP **8.1+** d’[Astral](https://github.com/astral-php/astral) : HTTP, DI, routeur, auth, DAO, vues, migrations, CLI, ErrorHandler.
+Moteur PHP **8.3+** d’[Astral](https://github.com/astral-php/astral) : HTTP, DI, routeur, auth, DAO, vues, migrations, CLI, ErrorHandler.
 
 Package **`library`** — fondation des **applications** (`create-project`) et des **composants** (`require`).
 
-[![PHP](https://img.shields.io/badge/PHP-8.1%E2%80%938.5-777BB4?logo=php&logoColor=white)](https://www.php.net)
-[![Version](https://img.shields.io/badge/version-1.2.4-blue)](./CHANGELOG.md)
+[![PHP](https://img.shields.io/badge/PHP-8.3%E2%80%938.5-777BB4?logo=php&logoColor=white)](https://www.php.net)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)](./CHANGELOG.md)
 [![Tests](https://img.shields.io/badge/tests-PHPUnit%209.6-9933CC)](./phpunit.xml)
 
 ## Installation
 
 ```bash
-composer require astral-php/astral-core:^1.2
+composer require astral-php/astral-core:^2.0
 ```
+
+Migration depuis 1.x : [`UPGRADE-2.0.md`](./UPGRADE-2.0.md).
 
 En local (`components-astral`) :
 
@@ -50,7 +52,7 @@ composer test
 
 ```json
 "require": {
-  "astral-php/astral-core": "^1.2"
+  "astral-php/astral-core": "^2.0"
 }
 ```
 
@@ -58,8 +60,8 @@ L’app hôte définit `BASE_PATH`, fournit `app/`, `config/`, `public/`, `views
 
 ## Compatibilité
 
-- PHP : `^8.1` (cible 8.1 → 8.5)
-- Aligné sur Astral MVC **1.2.4** (hub doc) ; package **1.2.4**
+- PHP : **`^8.3`**
+- Feuille Astral **2.0** — voir `CHANGELOG.md` et `UPGRADE-2.0.md`
 
 ## Licence
 

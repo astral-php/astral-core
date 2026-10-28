@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Tests\Core;
 
 use Core\Cache;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use stdClass;
 
 /**
- * Tests unitaires du cache fichier.
- * Couvre : get/set/has/forget/flush/remember + expiration TTL.
- * Utilise un répertoire temporaire isolé, nettoyé après chaque test.
+ * Tests unitaires du cache fichier 2.0 (spec C1–C8).
  */
 final class CacheTest extends TestCase
 {
@@ -19,18 +20,17 @@ final class CacheTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'astral_cache_test_' . uniqid();
+        $this->cacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'astral_cache_test_' . uniqid('', true);
         $this->cache    = new Cache($this->cacheDir);
     }
 
     protected function tearDown(): void
     {
-        // Supprime tous les fichiers .cache du répertoire temporaire
         if (is_dir($this->cacheDir)) {
             foreach (glob($this->cacheDir . DIRECTORY_SEPARATOR . '*.cache') ?: [] as $file) {
-                unlink($file);
+                @unlink($file);
             }
-            rmdir($this->cacheDir);
+            @rmdir($this->cacheDir);
         }
     }
 
@@ -67,10 +67,65 @@ final class CacheTest extends TestCase
         $this->assertSame('fallback', $this->cache->get('nonexistent', 'fallback'));
     }
 
-    public function testGetReturnsNullAfterTtlExpired(): void
+    public function testGetAndHasWithStoredNull(): void
     {
-        $this->cache->set('ephemeral', 'gone', -1); // TTL expiré dans le passé
+        $this->cache->set('nullable', null, 60);
+
+        $this->assertTrue($this->cache->has('nullable'));
+        $this->assertNull($this->cache->get('nullable'));
+        $this->assertSame('miss', $this->cache->get('other', 'miss'));
+    }
+
+    public function testGetReturnsDefaultAfterExpiry(): void
+    {
+        $this->writeExpiredPayload('ephemeral', 'gone');
+
         $this->assertNull($this->cache->get('ephemeral'));
+        $this->assertFalse($this->cache->has('ephemeral'));
+    }
+
+    public function testCorruptPayloadIsTreatedAsMiss(): void
+    {
+        $this->ensureDir();
+        file_put_contents($this->filePath('bad'), 'not-serialized');
+
+        $this->assertNull($this->cache->get('bad'));
+        $this->assertFalse($this->cache->has('bad'));
+    }
+
+    public function testObjectInPayloadIsRejectedOnRead(): void
+    {
+        $this->ensureDir();
+        $payload = serialize([
+            'expires_at' => time() + 60,
+            'value'      => new stdClass(),
+        ]);
+        file_put_contents($this->filePath('obj'), $payload);
+
+        $this->assertNull($this->cache->get('obj'));
+        $this->assertFalse($this->cache->has('obj'));
+    }
+
+    // -------------------------------------------------------------------------
+    // TTL
+    // -------------------------------------------------------------------------
+
+    public function testSetRejectsZeroTtl(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->set('k', 'v', 0);
+    }
+
+    public function testSetRejectsNegativeTtl(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->set('k', 'v', -1);
+    }
+
+    public function testRememberRejectsInvalidTtl(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->cache->remember('k', 0, static fn () => 'x');
     }
 
     // -------------------------------------------------------------------------
@@ -90,7 +145,7 @@ final class CacheTest extends TestCase
 
     public function testHasReturnsFalseAfterExpiry(): void
     {
-        $this->cache->set('temp', 'value', -1);
+        $this->writeExpiredPayload('temp', 'value');
         $this->assertFalse($this->cache->has('temp'));
     }
 
@@ -138,7 +193,7 @@ final class CacheTest extends TestCase
 
     public function testFlushReturnsZeroWhenDirectoryDoesNotExist(): void
     {
-        $emptyCache = new Cache('/nonexistent/path/astral_test');
+        $emptyCache = new Cache(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'astral_cache_missing_' . uniqid('', true));
         $this->assertSame(0, $emptyCache->flush());
     }
 
@@ -176,14 +231,29 @@ final class CacheTest extends TestCase
         $this->assertSame(1, $calls);
     }
 
+    public function testRememberKeepsCachedNull(): void
+    {
+        $calls = 0;
+
+        $this->cache->remember('maybe', 60, function () use (&$calls) {
+            $calls++;
+            return null;
+        });
+
+        $result = $this->cache->remember('maybe', 60, function () use (&$calls) {
+            $calls++;
+            return 'should-not-run';
+        });
+
+        $this->assertNull($result);
+        $this->assertSame(1, $calls);
+    }
+
     public function testRememberRecomputesAfterExpiry(): void
     {
         $calls = 0;
 
-        $this->cache->remember('short', -1, function () use (&$calls) {
-            $calls++;
-            return 'v1';
-        });
+        $this->writeExpiredPayload('short', 'v1');
 
         $result = $this->cache->remember('short', 60, function () use (&$calls) {
             $calls++;
@@ -191,6 +261,32 @@ final class CacheTest extends TestCase
         });
 
         $this->assertSame('v2', $result);
-        $this->assertSame(2, $calls);
+        $this->assertSame(1, $calls);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private function ensureDir(): void
+    {
+        if (!is_dir($this->cacheDir) && !mkdir($this->cacheDir, 0755, true) && !is_dir($this->cacheDir)) {
+            throw new RuntimeException('Unable to create test cache dir.');
+        }
+    }
+
+    private function filePath(string $key): string
+    {
+        return $this->cacheDir . DIRECTORY_SEPARATOR . md5($key) . '.cache';
+    }
+
+    private function writeExpiredPayload(string $key, mixed $value): void
+    {
+        $this->ensureDir();
+        $payload = serialize([
+            'expires_at' => time() - 10,
+            'value'      => $value,
+        ]);
+        file_put_contents($this->filePath($key), $payload);
     }
 }
