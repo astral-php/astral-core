@@ -31,8 +31,9 @@ use Core\Request;
  */
 final class BearerTokenMiddleware implements MiddlewareInterface
 {
-    public function __construct(private string $apiKey) {}
+    public function __construct(private readonly string $apiKey) {}
 
+    #[\Override]
     public function handle(Request $request, callable $next): mixed
     {
         $header = (string) $request->header('Authorization', '');

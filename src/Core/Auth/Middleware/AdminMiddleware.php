@@ -24,8 +24,9 @@ use Core\Request;
  */
 final class AdminMiddleware implements MiddlewareInterface
 {
-    public function __construct(private Auth $auth) {}
+    public function __construct(private readonly Auth $auth) {}
 
+    #[\Override]
     public function handle(Request $request, callable $next): mixed
     {
         if (!$this->auth->check()) {

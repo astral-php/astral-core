@@ -18,14 +18,15 @@ namespace Core\Console;
 final class Console
 {
     /** @var array<string, CommandInterface> */
-    private array $commands = [];
+    private readonly array $commands = [];
 
-    public function __construct(private string $appName = 'Astral MVC Console') {}
+    public function __construct(private readonly string $appName = 'Astral MVC Console') {}
 
     // -------------------------------------------------------------------------
     // Enregistrement
     // -------------------------------------------------------------------------
 
+    #[\Override]
     public function register(CommandInterface $command): self
     {
         $this->commands[$command->getName()] = $command;

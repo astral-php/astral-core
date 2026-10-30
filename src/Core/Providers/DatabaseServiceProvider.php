@@ -16,6 +16,7 @@ use Database\Connection;
  */
 final class DatabaseServiceProvider implements ServiceProviderInterface
 {
+    #[\Override]
     public function register(Container $container, array $appConfig, array $dbConfig): void
     {
         $container->singleton(\PDO::class, fn() => Connection::getInstance($dbConfig));

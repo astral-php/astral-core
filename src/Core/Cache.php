@@ -26,7 +26,7 @@ use RuntimeException;
  */
 final class Cache
 {
-    public function __construct(private string $cacheDir) {}
+    public function __construct(private readonly string $cacheDir) {}
 
     // -------------------------------------------------------------------------
     // API principale

@@ -12,7 +12,7 @@ namespace Core;
  */
 final class Session
 {
-    private const FLASH_KEY = '_flash';
+    private const string FLASH_KEY = '_flash';
 
     private bool $started = false;
 

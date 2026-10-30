@@ -19,18 +19,21 @@ use Database\Migration\Migrator;
  */
 final class MigrateRollbackCommand implements CommandInterface
 {
-    public function __construct(private Migrator $migrator) {}
+    public function __construct(private readonly Migrator $migrator) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'migrate:rollback';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Annule les migrations du dernier batch';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         $console->warning('Annulation du dernier batch de migrations…');

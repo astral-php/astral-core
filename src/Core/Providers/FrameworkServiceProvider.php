@@ -26,6 +26,7 @@ use Core\View;
  */
 final class FrameworkServiceProvider implements ServiceProviderInterface
 {
+    #[\Override]
     public function register(Container $container, array $appConfig, array $dbConfig): void
     {
         $container->singleton(Session::class, fn() => new Session());

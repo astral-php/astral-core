@@ -14,18 +14,21 @@ use Core\Console\Console;
  */
 final class ClearCacheCommand implements CommandInterface
 {
-    public function __construct(private string $cacheDir) {}
+    public function __construct(private readonly string $cacheDir) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'cache:clear';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Supprime tous les fichiers du cache fichier';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         if (!is_dir($this->cacheDir)) {

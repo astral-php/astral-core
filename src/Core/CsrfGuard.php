@@ -21,10 +21,10 @@ use Core\Exception\CsrfException;
  */
 final class CsrfGuard
 {
-    private const SESSION_KEY = '_csrf_token';
-    private const TOKEN_BYTES = 32;
+    private const string SESSION_KEY = '_csrf_token';
+    private const int TOKEN_BYTES = 32;
 
-    public function __construct(private Session $session) {}
+    public function __construct(private readonly Session $session) {}
 
     // -------------------------------------------------------------------------
     // Génération du token

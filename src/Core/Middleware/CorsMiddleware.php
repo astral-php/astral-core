@@ -29,11 +29,12 @@ use Core\Request;
 final class CorsMiddleware implements MiddlewareInterface
 {
     public function __construct(
-        private string $allowedOrigin  = '*',
-        private string $allowedMethods = 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-        private string $allowedHeaders = 'Content-Type, Authorization, Accept, X-Requested-With',
+        private readonly string $allowedOrigin  = '*',
+        private readonly string $allowedMethods = 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        private readonly string $allowedHeaders = 'Content-Type, Authorization, Accept, X-Requested-With',
     ) {}
 
+    #[\Override]
     public function handle(Request $request, callable $next): mixed
     {
         // ── Requête préflight OPTIONS — répondre immédiatement ────────────────

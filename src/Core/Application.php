@@ -33,7 +33,7 @@ final class Application
     /** @var array<string, mixed> */
     private array $appConfig = [];
 
-    private string $basePath;
+    private readonly string $basePath;
     private Logger $logger;
 
     public function __construct(string $basePath)

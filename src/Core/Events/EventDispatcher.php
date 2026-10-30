@@ -41,7 +41,7 @@ final class EventDispatcher
      */
     private array $listeners = [];
 
-    public function __construct(private Container $container) {}
+    public function __construct(private readonly Container $container) {}
 
     // -------------------------------------------------------------------------
     // Enregistrement

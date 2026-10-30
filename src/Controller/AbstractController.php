@@ -19,12 +19,7 @@ use Core\View;
  */
 abstract class AbstractController
 {
-    protected View $view;
-
-    public function __construct(View $view)
-    {
-        $this->view = $view;
-    }
+    public function __construct(protected readonly View $view) {}
 
     // -------------------------------------------------------------------------
     // Réponses

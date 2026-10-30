@@ -26,20 +26,23 @@ use Core\Console\Console;
 final class MakeControllerCommand implements CommandInterface
 {
     public function __construct(
-        private string $controllersPath,
-        private string $daoPath,
+        private readonly string $controllersPath,
+        private readonly string $daoPath,
     ) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'make:controller';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Génère un contrôleur dans app/Controllers/ [--resource|--api]';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         $name = $args[0] ?? null;
@@ -165,8 +168,8 @@ final class MakeControllerCommand implements CommandInterface
         {
             public function __construct(
                 View            \$view,
-                private Request \$request,
-                private Session \$session,{$daoParam}
+                private readonly Request \$request,
+                private readonly Session \$session,{$daoParam}
             ) {
                 parent::__construct(\$view);
             }
@@ -311,7 +314,7 @@ final class MakeControllerCommand implements CommandInterface
         {
             public function __construct(
                 View            \$view,
-                private Request \$request,{$daoParam}
+                private readonly Request \$request,{$daoParam}
             ) {
                 parent::__construct(\$view);
             }

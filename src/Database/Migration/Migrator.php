@@ -24,13 +24,13 @@ use PDOException;
  */
 final class Migrator
 {
-    private const TABLE = 'migrations';
+    private const string TABLE = 'migrations';
 
     private bool $tableEnsured = false;
 
     public function __construct(
-        private PDO    $pdo,
-        private string $migrationsPath,
+        private readonly PDO $pdo,
+        private readonly string $migrationsPath,
     ) {}
 
     // -------------------------------------------------------------------------

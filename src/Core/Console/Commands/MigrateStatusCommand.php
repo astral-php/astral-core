@@ -19,18 +19,21 @@ use Database\Migration\Migrator;
  */
 final class MigrateStatusCommand implements CommandInterface
 {
-    public function __construct(private Migrator $migrator) {}
+    public function __construct(private readonly Migrator $migrator) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'migrate:status';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Affiche l\'état de toutes les migrations';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         try {

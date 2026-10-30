@@ -20,7 +20,7 @@ final class ValidationException extends RuntimeException
 {
     /** @param array<string, list<string>> $errors */
     public function __construct(
-        private array $errors,
+        private readonly array $errors,
         string $message = 'Les données soumises sont invalides.',
     ) {
         parent::__construct($message);

@@ -14,8 +14,8 @@ use RuntimeException;
  */
 final class View
 {
-    private string $viewsPath;
-    private string $layoutsPath;
+    private readonly string $viewsPath;
+    private readonly string $layoutsPath;
     private string $layout;
 
     /** @var array<string, mixed> */

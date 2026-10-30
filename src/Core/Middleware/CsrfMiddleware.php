@@ -22,8 +22,9 @@ use Core\Request;
  */
 final class CsrfMiddleware implements MiddlewareInterface
 {
-    public function __construct(private CsrfGuard $csrf) {}
+    public function __construct(private readonly CsrfGuard $csrf) {}
 
+    #[\Override]
     public function handle(Request $request, callable $next): mixed
     {
         $this->csrf->verifyRequest($request);

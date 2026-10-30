@@ -14,7 +14,7 @@ namespace Core;
  */
 final class Logger
 {
-    public function __construct(private string $logDir) {}
+    public function __construct(private readonly string $logDir) {}
 
     // -------------------------------------------------------------------------
     // API publique

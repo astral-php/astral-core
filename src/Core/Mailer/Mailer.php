@@ -25,14 +25,15 @@ use RuntimeException;
 final class Mailer
 {
     public function __construct(
-        private string $driver,
-        private string $host,
-        private int    $port,
-        private string $username,
-        private string $password,
-        private string $encryption,
-        private string $from,
-        private string $fromName,
+        private readonly string $driver,
+        private readonly string $host,
+        private readonly int $port,
+        private readonly string $username,
+        #[\SensitiveParameter]
+        private readonly string $password,
+        private readonly string $encryption,
+        private readonly string $from,
+        private readonly string $fromName,
     ) {}
 
     /**

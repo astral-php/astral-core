@@ -38,8 +38,8 @@ final class Router
     private string $lastPath         = '';
 
     public function __construct(
-        private Request   $request,
-        private Container $container,
+        private readonly Request $request,
+        private readonly Container $container,
     ) {}
 
     // -------------------------------------------------------------------------

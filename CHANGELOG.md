@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.0] — 2026-10-30
+
+### Ajouté
+
+- Value objects opt-in : `Core\ValueObject\EmailAddress`, `Core\ValueObject\UserId`
+- `#[\Override]` sur middlewares, providers et commandes console
+- Constantes de classe typées (`Auth`, `Session`, `CsrfGuard`, `Migrator`)
+- `#[\SensitiveParameter]` sur le mot de passe `Mailer`
+
+### Modifié
+
+- Dépendances ctor immuables marquées `readonly` (Auth, Cache, Logger, Mailer, Csrf, Events, Router deps, middlewares, CLI, Migrator, AbstractDao PDO, AbstractController View, chemins View, …)
+
+### Notes
+
+- **Pas de breaking API** sur Router / Container / Request / Response / Auth / Mailer / DAO.
+- Guide : [`UPGRADE-2.1.md`](./UPGRADE-2.1.md).
+
 ## [2.0.0] — 2026-10-28
 
 ### Breaking

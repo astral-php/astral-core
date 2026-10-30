@@ -19,20 +19,23 @@ use Core\Console\Console;
 final class MakeDaoCommand implements CommandInterface
 {
     public function __construct(
-        private string $daoPath,
-        private string $modelsPath,
+        private readonly string $daoPath,
+        private readonly string $modelsPath,
     ) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'make:dao';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Génère un DAO dans app/Dao/';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         $name = $args[0] ?? null;

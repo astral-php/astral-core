@@ -20,18 +20,21 @@ use Core\Console\Console;
  */
 final class MakeMigrationCommand implements CommandInterface
 {
-    public function __construct(private string $migrationsPath) {}
+    public function __construct(private readonly string $migrationsPath) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'make:migration';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Génère un nouveau fichier de migration horodaté';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         $name = $args[0] ?? null;

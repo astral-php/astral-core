@@ -5,16 +5,16 @@ Moteur PHP **8.3+** d’[Astral](https://github.com/astral-php/astral) : HTTP, D
 Package **`library`** — fondation des **applications** (`create-project`) et des **composants** (`require`).
 
 [![PHP](https://img.shields.io/badge/PHP-8.3%E2%80%938.5-777BB4?logo=php&logoColor=white)](https://www.php.net)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue)](./CHANGELOG.md)
 [![Tests](https://img.shields.io/badge/tests-PHPUnit%209.6-9933CC)](./phpunit.xml)
 
 ## Installation
 
 ```bash
-composer require astral-php/astral-core:^2.0
+composer require astral-php/astral-core:^2.1
 ```
 
-Migration depuis 1.x : [`UPGRADE-2.0.md`](./UPGRADE-2.0.md).
+Migration 1.x → 2.0 : [`UPGRADE-2.0.md`](./UPGRADE-2.0.md) · 2.0 → 2.1 : [`UPGRADE-2.1.md`](./UPGRADE-2.1.md).
 
 En local (`components-astral`) :
 

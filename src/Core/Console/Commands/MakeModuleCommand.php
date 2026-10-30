@@ -24,20 +24,23 @@ use Core\Console\Console;
 final class MakeModuleCommand implements CommandInterface
 {
     public function __construct(
-        private string              $basePath,
-        private MakeMigrationCommand $migrationCommand,
+        private readonly string              $basePath,
+        private readonly MakeMigrationCommand $migrationCommand,
     ) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'make:module';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Génère un module complet (Model + DAO + Controller + Migration)';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         $name = $args[0] ?? null;

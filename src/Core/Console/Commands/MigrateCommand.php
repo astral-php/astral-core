@@ -19,18 +19,21 @@ use Database\Migration\Migrator;
  */
 final class MigrateCommand implements CommandInterface
 {
-    public function __construct(private Migrator $migrator) {}
+    public function __construct(private readonly Migrator $migrator) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'migrate';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Exécute toutes les migrations en attente';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         $console->info('Exécution des migrations…');

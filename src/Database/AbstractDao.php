@@ -20,8 +20,6 @@ use PDOException;
  */
 abstract class AbstractDao
 {
-    protected PDO $pdo;
-
     abstract protected function getTable(): string;
 
     /**
@@ -33,10 +31,7 @@ abstract class AbstractDao
         return null;
     }
 
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(protected readonly PDO $pdo) {}
 
     // -------------------------------------------------------------------------
     // CRUD générique

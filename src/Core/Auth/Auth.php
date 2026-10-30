@@ -25,9 +25,9 @@ use Core\Session;
  */
 final class Auth
 {
-    private const SESSION_KEY = '_auth';
+    private const string SESSION_KEY = '_auth';
 
-    public function __construct(private Session $session) {}
+    public function __construct(private readonly Session $session) {}
 
     // -------------------------------------------------------------------------
     // Connexion / déconnexion

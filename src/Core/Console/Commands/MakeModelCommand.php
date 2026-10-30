@@ -18,18 +18,21 @@ use Core\Console\Console;
  */
 final class MakeModelCommand implements CommandInterface
 {
-    public function __construct(private string $modelsPath) {}
+    public function __construct(private readonly string $modelsPath) {}
 
+    #[\Override]
     public function getName(): string
     {
         return 'make:model';
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'Génère un modèle dans app/Models/';
     }
 
+    #[\Override]
     public function execute(array $args, Console $console): int
     {
         $name = $args[0] ?? null;
