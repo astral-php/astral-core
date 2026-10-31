@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.2] — 2026-10-31
+
+### Corrigé
+
+- `Console::register()` : retrait de `#[\Override]` sans méthode parente (fatal PHP 8.3).
+
 ## [2.1.1] — 2026-10-31
 
 ### Corrigé

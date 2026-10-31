@@ -2,7 +2,7 @@
   "name": "astral-php/astral-core",
   "description": "Astral Core — moteur PHP 8.3+ (HTTP, DI, router, auth, DAO, vues, CLI) pour les applications et composants Astral",
   "type": "library",
-    "version": "2.1.1",
+    "version": "2.1.2",
   "license": "MIT",
   "keywords": [
     "astral",

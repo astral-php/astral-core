@@ -26,7 +26,6 @@ final class Console
     // Enregistrement
     // -------------------------------------------------------------------------
 
-    #[\Override]
     public function register(CommandInterface $command): self
     {
         $this->commands[$command->getName()] = $command;
