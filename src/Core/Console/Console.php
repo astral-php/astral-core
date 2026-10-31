@@ -18,7 +18,7 @@ namespace Core\Console;
 final class Console
 {
     /** @var array<string, CommandInterface> */
-    private readonly array $commands = [];
+    private array $commands = [];
 
     public function __construct(private readonly string $appName = 'Astral MVC Console') {}
 

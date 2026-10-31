@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.1] — 2026-10-31
+
+### Corrigé
+
+- `Core\Console\Console::$commands` : retrait de `readonly` avec valeur par défaut (fatal PHP 8.3 — bloquait tout `bin/console`).
+
 ## [2.1.0] — 2026-10-30
 
 ### Ajouté
