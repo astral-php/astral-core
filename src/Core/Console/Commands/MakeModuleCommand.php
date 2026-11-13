@@ -14,12 +14,12 @@ use Core\Console\Console;
  * le modèle, le DAO, le contrôleur et la migration d'une entité.
  *
  * Mode direct (argument fourni) :
- *   php bin/console make:module Article              ← tout générer
- *   php bin/console make:module Article --api        ← contrôleur API
- *   php bin/console make:module Article --no-migrate ← sans migration
+ *   php astral make:module Article              ← tout générer
+ *   php astral make:module Article --api        ← contrôleur API
+ *   php astral make:module Article --no-migrate ← sans migration
  *
  * Mode interactif (sans argument) :
- *   php bin/console make:module
+ *   php astral make:module
  */
 final class MakeModuleCommand implements CommandInterface
 {
@@ -171,7 +171,7 @@ final class MakeModuleCommand implements CommandInterface
         }
 
         $generated = [];
-        $warnings  = [];
+        $failed    = [];
 
         // Model
         if ($genModel) {
@@ -182,6 +182,8 @@ final class MakeModuleCommand implements CommandInterface
             );
             if ($result === 0) {
                 $generated[] = "app/Models/{$name}.php";
+            } else {
+                $failed[] = "app/Models/{$name}.php";
             }
         }
 
@@ -197,6 +199,8 @@ final class MakeModuleCommand implements CommandInterface
             );
             if ($result === 0) {
                 $generated[] = "app/Dao/{$name}Dao.php";
+            } else {
+                $failed[] = "app/Dao/{$name}Dao.php";
             }
         }
 
@@ -219,6 +223,8 @@ final class MakeModuleCommand implements CommandInterface
             );
             if ($result === 0) {
                 $generated[] = "app/Controllers/{$name}Controller.php";
+            } else {
+                $failed[] = "app/Controllers/{$name}Controller.php";
             }
         }
 
@@ -232,11 +238,13 @@ final class MakeModuleCommand implements CommandInterface
             );
             if ($result === 0) {
                 $generated[] = "database/migrations/…_{$migrationName}.php";
+            } else {
+                $failed[] = "database/migrations/…_{$migrationName}.php";
             }
         }
 
         // Résumé
-        if (!empty($generated)) {
+        if ($generated !== []) {
             $console->writeln('');
             $console->writeln("\033[1mFichiers générés :\033[0m");
             foreach ($generated as $file) {
@@ -244,17 +252,25 @@ final class MakeModuleCommand implements CommandInterface
             }
         }
 
+        if ($failed !== []) {
+            $console->writeln('');
+            $console->error('Échec partiel — éléments non créés :');
+            foreach ($failed as $file) {
+                $console->writeln("  ✗ {$file}");
+            }
+            return 1;
+        }
+
         // Prochaines étapes
         $console->writeln('');
         $console->writeln("\033[1mProchaines étapes :\033[0m");
 
         if ($genMigration) {
-            $console->writeln("  \033[33m1.\033[0m Éditez la migration et lancez : <comment>php bin/console migrate</comment>");
+            $console->writeln("  \033[33m1.\033[0m Éditez la migration et lancez : <comment>php astral migrate</comment>");
         }
 
         $console->writeln("  \033[33m" . ($genMigration ? '2' : '1') . ".\033[0m Enregistrez dans <comment>app/Providers/AppServiceProvider.php</comment> :");
         $table = $this->toSnakePlural($name);
-        $entity = lcfirst($name);
         $console->writeln("     <info>\$container->singleton({$name}Dao::class, fn(\$c) => new {$name}Dao(\$c->make(PDO::class)));</info>");
         $console->writeln("     <info>\$container->bind({$name}Controller::class, fn(\$c) => new {$name}Controller(\$c->make(View::class), ...));</info>");
 

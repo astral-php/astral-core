@@ -43,8 +43,8 @@ final class MakeMigrationCommand implements CommandInterface
             $console->error('Usage : make:migration <nom_en_snake_case>');
             $console->writeln('');
             $console->writeln('  Exemples :');
-            $console->writeln('    <comment>php bin/console make:migration create_articles_table</comment>');
-            $console->writeln('    <comment>php bin/console make:migration add_slug_to_articles_table</comment>');
+            $console->writeln('    <comment>php astral make:migration create_articles_table</comment>');
+            $console->writeln('    <comment>php astral make:migration add_slug_to_articles_table</comment>');
             return 1;
         }
 
@@ -55,14 +55,25 @@ final class MakeMigrationCommand implements CommandInterface
             return 1;
         }
 
-        if (!is_dir($this->migrationsPath)) {
-            mkdir($this->migrationsPath, 0755, true);
+        if (!is_dir($this->migrationsPath) && !mkdir($this->migrationsPath, 0755, true) && !is_dir($this->migrationsPath)) {
+            $console->error("Impossible de créer le dossier : {$this->migrationsPath}");
+            return 1;
+        }
+
+        $className = $this->toClassName($name);
+        if ($this->classNameExists($className)) {
+            $console->error("Une migration avec la classe \"{$className}\" existe déjà.");
+            return 1;
         }
 
         $timestamp = date('Y_m_d_His');
         $filename  = "{$timestamp}_{$name}.php";
-        $className = $this->toClassName($name);
         $path      = $this->migrationsPath . DIRECTORY_SEPARATOR . $filename;
+
+        if (is_file($path)) {
+            $console->error("Le fichier existe déjà : database/migrations/{$filename}");
+            return 1;
+        }
 
         $isCreateTable = preg_match('/^create_(.+)_table$/', $name, $m);
         $tableName     = $isCreateTable ? $m[1] : 'nom_de_la_table';
@@ -71,7 +82,10 @@ final class MakeMigrationCommand implements CommandInterface
             ? $this->stubCreateTable($className, $tableName)
             : $this->stubGeneric($className);
 
-        file_put_contents($path, $stub);
+        if (file_put_contents($path, $stub) === false) {
+            $console->error("Écriture impossible : database/migrations/{$filename}");
+            return 1;
+        }
 
         $console->success("Migration créée : database/migrations/{$filename}");
         $console->writeln('');
@@ -165,5 +179,25 @@ final class MakeMigrationCommand implements CommandInterface
     private function toClassName(string $snake): string
     {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $snake)));
+    }
+
+    private function classNameExists(string $className): bool
+    {
+        if (!is_dir($this->migrationsPath)) {
+            return false;
+        }
+
+        $files = glob($this->migrationsPath . DIRECTORY_SEPARATOR . '*.php') ?: [];
+        foreach ($files as $file) {
+            $contents = @file_get_contents($file);
+            if ($contents === false) {
+                continue;
+            }
+            if (preg_match('/\bclass\s+' . preg_quote($className, '/') . '\b/', $contents) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.2.0] — 2026-11-13 (feuille 2.2 · CLI)
+
+### Ajouté
+
+- `Core\Console\ConsoleFactory` — bootstrap commun, migrations en lazy PDO
+- `Core\Console\Input` — parse arguments / options
+- `serve` — serveur de développement PHP (`public/` + `router.php`)
+- Chargement `config/console.php` → commandes `app/Console/`
+
+### Corrigé / amélioré
+
+- CLI-01/02 : plus de connexion DB au démarrage pour `list` / `make:*`
+- CLI-03 : `make:module` propage les échecs (code ≠ 0)
+- CLI-06 : `make:migration` refuse collision fichier / classe
+- CLI-07 : `error` / `warning` sur STDERR
+- CLI-08 : exceptions de commande → message + code 1
+- CLI-09 : doublon d’enregistrement → avertissement explicite
+- `<commande> --help` / `-h` sans exécution (ex. pas de génération `Help`)
+- Options globales : `--no-ansi`, `--no-interaction`
+
 ## [2.1.2] — 2026-10-31
 
 ### Corrigé

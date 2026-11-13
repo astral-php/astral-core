@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Console\Commands;
 
+use Closure;
 use Core\Console\CommandInterface;
 use Core\Console\Console;
 use Database\Exception\DatabaseException;
@@ -12,14 +13,18 @@ use Database\Migration\Migrator;
 /**
  * Commande : migrate:status
  *
- * Affiche l'état de toutes les migrations (appliquées, en attente, orphelines).
- *
- * Usage :
- *   php bin/console migrate:status
+ * @param Migrator|Closure(): Migrator $migrator
  */
 final class MigrateStatusCommand implements CommandInterface
 {
-    public function __construct(private readonly Migrator $migrator) {}
+    /** @var Migrator|Closure(): Migrator */
+    private Migrator|Closure $migrator;
+
+    /** @param Migrator|Closure(): Migrator $migrator */
+    public function __construct(Migrator|Closure $migrator)
+    {
+        $this->migrator = $migrator;
+    }
 
     #[\Override]
     public function getName(): string
@@ -37,13 +42,16 @@ final class MigrateStatusCommand implements CommandInterface
     public function execute(array $args, Console $console): int
     {
         try {
-            $status = $this->migrator->status();
+            $status = $this->resolve()->status();
         } catch (DatabaseException $e) {
             $console->error($e->getMessage());
             return 1;
+        } catch (\Throwable $e) {
+            $console->error('Connexion base de données impossible : ' . $e->getMessage());
+            return 1;
         }
 
-        if (empty($status)) {
+        if ($status === []) {
             $console->info('Aucune migration trouvée dans database/migrations/');
             return 0;
         }
@@ -65,6 +73,11 @@ final class MigrateStatusCommand implements CommandInterface
         $console->writeln('');
 
         return 0;
+    }
+
+    private function resolve(): Migrator
+    {
+        return $this->migrator instanceof Migrator ? $this->migrator : ($this->migrator)();
     }
 
     private function formatStatus(string $status): string

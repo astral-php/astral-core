@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Console\Commands;
 
+use Closure;
 use Core\Console\CommandInterface;
 use Core\Console\Console;
 use Database\Exception\DatabaseException;
@@ -12,14 +13,18 @@ use Database\Migration\Migrator;
 /**
  * Commande : migrate
  *
- * Exécute toutes les migrations en attente dans un nouveau batch.
- *
- * Usage :
- *   php bin/console migrate
+ * @param Migrator|Closure(): Migrator $migrator
  */
 final class MigrateCommand implements CommandInterface
 {
-    public function __construct(private readonly Migrator $migrator) {}
+    /** @var Migrator|Closure(): Migrator */
+    private Migrator|Closure $migrator;
+
+    /** @param Migrator|Closure(): Migrator $migrator */
+    public function __construct(Migrator|Closure $migrator)
+    {
+        $this->migrator = $migrator;
+    }
 
     #[\Override]
     public function getName(): string
@@ -40,13 +45,16 @@ final class MigrateCommand implements CommandInterface
         $console->writeln('');
 
         try {
-            $executed = $this->migrator->run();
+            $executed = $this->resolve()->run();
         } catch (DatabaseException $e) {
             $console->error($e->getMessage());
             return 1;
+        } catch (\Throwable $e) {
+            $console->error('Connexion base de données impossible : ' . $e->getMessage());
+            return 1;
         }
 
-        if (empty($executed)) {
+        if ($executed === []) {
             $console->info('Aucune migration en attente — base de données à jour.');
             return 0;
         }
@@ -60,5 +68,10 @@ final class MigrateCommand implements CommandInterface
         $console->info("{$count} migration(s) exécutée(s) avec succès.");
 
         return 0;
+    }
+
+    private function resolve(): Migrator
+    {
+        return $this->migrator instanceof Migrator ? $this->migrator : ($this->migrator)();
     }
 }
